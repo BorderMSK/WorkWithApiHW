@@ -7,31 +7,50 @@
 
 import UIKit
 
+enum PostsResult {
+    case success(posts: [Model])
+    case failure(error: Error)
+}
+
 class NetworkManager {
     
     let session = URLSession.shared
     let sessionConfiguration = URLSessionConfiguration.default
     let decoder = JSONDecoder()
     
-    func getPosts() {
+    func getPosts(completion: @escaping (PostsResult) -> Void) {
         
        guard let url = URL(string: "https://jsonplaceholder.typicode.com/posts") else { return }
         
         session.dataTask(with: url) { [weak self] (data, response, error) in
             
-            guard let strongSelf = self else { return }
+            var result: PostsResult
+            
+            defer {
+                DispatchQueue.main.async {
+                    completion(result)
+                }
+            }
+            
+            guard let strongSelf = self else {
+                result = .success(posts: [])
+                
+                return
+            }
             
             if error == nil, let parsData = data{
                 guard let posts = try? strongSelf.decoder.decode([Model].self, from: parsData) else {
+                    
+                    result = .success(posts: [])
+                    
                     return
                 }
-
+                result = .success(posts: posts)
             }
             else{
-                print("Error: \(error?.localizedDescription)")
+                
+                result = .failure(error: error!)
             }
-            
         }.resume()
-        
     }
 }

@@ -16,8 +16,22 @@ class MainViewController: UIViewController, UITableViewDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         tableView.dataSource = self
-        networkManager.getPosts()
+        
+        networkManager.getPosts { (result) in
+            
+            switch result {
+            case .success(let posts):
+                self.dataSource = posts
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            case .failure(let error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
