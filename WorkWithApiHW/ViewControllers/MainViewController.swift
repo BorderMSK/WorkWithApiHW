@@ -9,7 +9,6 @@ import UIKit
 
 class MainViewController: UIViewController, UITableViewDataSource {
     
-    let networkManager = NetworkManager()
     var dataSource = [Model]()
     
     @IBOutlet var tableView: UITableView!
@@ -19,20 +18,7 @@ class MainViewController: UIViewController, UITableViewDataSource {
         
         tableView.dataSource = self
         
-        networkManager.getPosts { (result) in
-            
-            switch result {
-            
-            case .success(let posts):
-                self.dataSource = posts
-                
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
-            case .failure(let error):
-                print("Error: \(error.localizedDescription)")
-            }
-        }
+        getData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -43,12 +29,34 @@ class MainViewController: UIViewController, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         
-        let post = dataSource[indexPath.row]
+        let data = dataSource[indexPath.row]
         
-        cell.textLabel?.text = post.title
-        cell.detailTextLabel?.text = post.body
+        cell.textLabel?.text = data.title
+        cell.detailTextLabel?.text = data.body
         
         return cell
+    }
+}
+extension MainViewController {
+    
+    private func getData() {
+        
+        guard let url = URL(string: "https://jsonplaceholder.typicode.com/posts") else { return }
+        
+        URLSession.shared.dataTask(with: url) {(data, _, error) in
+    
+            guard let data = data else { return }
+            
+            do {
+                self.dataSource = try JSONDecoder().decode([Model].self, from: data)
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            } catch let error {
+                print(error)
+            }
+        }.resume()
     }
 }
 
