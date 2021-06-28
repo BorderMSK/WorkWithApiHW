@@ -6,7 +6,7 @@
 //
 
 
-struct Model: Codable {
+struct Model: Decodable {
     let userId: Int
     let id: Int
     let title: String

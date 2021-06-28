@@ -22,6 +22,7 @@ class MainViewController: UIViewController, UITableViewDataSource {
         networkManager.getPosts { (result) in
             
             switch result {
+            
             case .success(let posts):
                 self.dataSource = posts
                 
@@ -37,6 +38,7 @@ class MainViewController: UIViewController, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSource.count
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)

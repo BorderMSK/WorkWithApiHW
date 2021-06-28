@@ -38,8 +38,8 @@ class NetworkManager {
                 return
             }
             
-            if error == nil, let parsData = data{
-                guard let posts = try? strongSelf.decoder.decode([Model].self, from: parsData) else {
+            if error == nil, let data = data{
+                guard let posts = try? strongSelf.decoder.decode([Model].self, from: data) else {
                     
                     result = .success(posts: [])
                     
